@@ -34,7 +34,14 @@ func TestSelector_withInsideNames_withName_isSuccess(t *testing.T) {
 		+ @rootToken .five
 	`
 
-	bytes, err := NewApplication().Execute(selector, result)
+	application := NewApplication()
+	selectorIns, err := application.Compile(selector)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	bytes, err := NewApplication().Execute(selectorIns, result)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -74,7 +81,14 @@ func TestSelector_withAnyElement_withPrefix_withSuffix_isSelected_isSuccess(t *t
 		+ @rootToken .five *
 	`
 
-	bytes, err := NewApplication().Execute(selector, result)
+	application := NewApplication()
+	selectorIns, err := application.Compile(selector)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	bytes, err := NewApplication().Execute(selectorIns, result)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -115,7 +129,14 @@ func TestSelector_afterSmallerThan_withAnyElement_withPrefix_withSuffix_isSelect
 		+ @rootToken .smallerThan *
 	`
 
-	bytes, err := NewApplication().Execute(selector, result)
+	application := NewApplication()
+	selectorIns, err := application.Compile(selector)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	bytes, err := NewApplication().Execute(selectorIns, result)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -157,7 +178,14 @@ func TestSelector_withRecursiveToken_afterSmallerThan_withAnyElement_withPrefix_
 		+ @rootToken @rootToken .smallerThan *
 	`
 
-	bytes, err := NewApplication().Execute(selector, result)
+	application := NewApplication()
+	selectorIns, err := application.Compile(selector)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	bytes, err := NewApplication().Execute(selectorIns, result)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

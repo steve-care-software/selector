@@ -23,15 +23,15 @@ func createApplication(
 	return &out
 }
 
-// Execute executes a selector on validation result
-func (app *application) Execute(script string, result results.Result) ([]byte, error) {
-	if !result.Token().IsSuccess() {
-		return nil, errors.New("the selector script cannot extract result tokens because the result is invalid")
-	}
+// Compile compiles a selector
+func (app *application) Compile(script string) (selectors.Selector, error) {
+	return app.adapter.ToSelector(script)
+}
 
-	selector, err := app.adapter.ToSelector(script)
-	if err != nil {
-		return nil, err
+// Execute executes a selector on validation result
+func (app *application) Execute(selector selectors.Selector, result results.Result) ([]byte, error) {
+	if !result.Token().IsSuccess() {
+		return nil, errors.New("the selector cannot extract result tokens because the result is invalid")
 	}
 
 	list := selector.List()

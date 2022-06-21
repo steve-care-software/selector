@@ -13,5 +13,6 @@ func NewApplication() Application {
 
 // Application represents the selector application
 type Application interface {
-	Execute(selector string, result results.Result) ([]byte, error)
+	Compile(script string) (selectors.Selector, error)
+	Execute(selector selectors.Selector, result results.Result) ([]byte, error)
 }
