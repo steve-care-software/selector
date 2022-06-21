@@ -1,8 +1,8 @@
 package applications
 
 import (
-	"github.com/steve-care-software/validator/domain/results"
 	"github.com/steve-care-software/selector/domain/selectors"
+	"github.com/steve-care-software/validator/domain/results"
 )
 
 // NewApplication creates a new application instance
@@ -13,5 +13,5 @@ func NewApplication() Application {
 
 // Application represents the selector application
 type Application interface {
-    Execute(selector string, result results.Result) ([]byte, error)
+	Execute(selector string, result results.Result) ([]byte, error)
 }

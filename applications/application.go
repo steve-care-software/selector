@@ -1,25 +1,26 @@
 package applications
 
 import (
-	"github.com/steve-care-software/selector/domain/selectors"
-    "github.com/steve-care-software/validator/domain/results"
+	"bytes"
 	"errors"
 	"fmt"
-	"bytes"
+
+	"github.com/steve-care-software/selector/domain/selectors"
+	"github.com/steve-care-software/validator/domain/results"
 )
 
 type application struct {
-    adapter selectors.Adapter
+	adapter selectors.Adapter
 }
 
 func createApplication(
-    adapter selectors.Adapter,
-    ) Application {
-    out := application{
-        adapter: adapter,
-    }
+	adapter selectors.Adapter,
+) Application {
+	out := application{
+		adapter: adapter,
+	}
 
-    return &out
+	return &out
 }
 
 // Execute executes a selector on validation result
@@ -28,19 +29,19 @@ func (app *application) Execute(script string, result results.Result) ([]byte, e
 		return nil, errors.New("the selector script cannot extract result tokens because the result is invalid")
 	}
 
-    selector, err := app.adapter.ToSelector(script)
-    if err != nil {
-        return nil, err
-    }
+	selector, err := app.adapter.ToSelector(script)
+	if err != nil {
+		return nil, err
+	}
 
 	list := selector.List()
 	token := result.Token()
-    return app.elementsOnToken(list, token)
+	return app.elementsOnToken(list, token)
 }
 
 func (app *application) elementsOnToken(elements []selectors.Element, token results.Token) ([]byte, error) {
 	output := []byte{}
-	for _, oneElement := range(elements) {
+	for _, oneElement := range elements {
 		bytes, err := app.elementOnToken(oneElement, token)
 		if err != nil {
 			return nil, err
@@ -55,7 +56,7 @@ func (app *application) elementsOnToken(elements []selectors.Element, token resu
 }
 
 func (app *application) elementOnToken(element selectors.Element, token results.Token) ([]byte, error) {
-	if element.IsName(){
+	if element.IsName() {
 		name := element.Name()
 		return app.nameInsOnToken(name, token)
 	}
@@ -104,13 +105,13 @@ func (app *application) nameOnToken(path []string, token results.Token) (bool, [
 
 	output := []byte{}
 	lines := block.List()
-	for _, oneLine := range(lines) {
+	for _, oneLine := range lines {
 		if !oneLine.IsSuccess() {
 			continue
 		}
 
 		elementsWithCardinality := oneLine.Elements()
-		for _, oneElementWithCardinality := range(elementsWithCardinality) {
+		for _, oneElementWithCardinality := range elementsWithCardinality {
 			if !oneElementWithCardinality.IsSuccess() {
 				continue
 			}
@@ -120,7 +121,7 @@ func (app *application) nameOnToken(path []string, token results.Token) (bool, [
 			}
 
 			matches := oneElementWithCardinality.Matches()
-			for _, oneElement := range(matches) {
+			for _, oneElement := range matches {
 				if oneElement.IsValue() {
 					pValue := oneElement.Value()
 					output = append(output, *pValue)
@@ -130,7 +131,7 @@ func (app *application) nameOnToken(path []string, token results.Token) (bool, [
 				if oneElement.IsToken() {
 					elementToken := oneElement.Token()
 					isTokenFound, tokenBytes, err := app.nameOnToken(currentPath, elementToken)
-					if err != nil{
+					if err != nil {
 						return false, nil, err
 					}
 
@@ -174,7 +175,7 @@ func (app *application) anyElementOnToken(anyElement selectors.AnyElement, token
 	stop := false
 	data := input[index:]
 	output := input[index:]
-	for idx := range(data) {
+	for idx := range data {
 		if bytes.HasPrefix(output, prefix) {
 			stop = true
 		}

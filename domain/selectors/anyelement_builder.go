@@ -1,6 +1,6 @@
 package selectors
 
-import(
+import (
 	"errors"
 )
 
@@ -40,6 +40,6 @@ func (app *anyElementBuilder) Now() (AnyElement, error) {
 	if app.prefix == nil {
 		return nil, errors.New("the prefix is mandatory in order to build an AnyElement instance")
 	}
-	
+
 	return createAnyElement(app.isSelected, app.prefix), nil
 }

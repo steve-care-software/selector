@@ -2,7 +2,8 @@ package applications
 
 import (
 	"testing"
-    validator "github.com/steve-care-software/validator/applications"
+
+	validator "github.com/steve-care-software/validator/applications"
 )
 
 func TestSelector_withInsideNames_withName_isSuccess(t *testing.T) {
@@ -29,20 +30,20 @@ func TestSelector_withInsideNames_withName_isSuccess(t *testing.T) {
 		return
 	}
 
-    selector := `
+	selector := `
 		+ @rootToken .five
 	`
 
-    bytes, err := NewApplication().Execute(selector, result)
-    if err != nil {
+	bytes, err := NewApplication().Execute(selector, result)
+	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-    if len(bytes) != 1 {
-        t.Errorf("%d bytes were expected, %d returned", 1, len(bytes))
-        return
-    }
+	if len(bytes) != 1 {
+		t.Errorf("%d bytes were expected, %d returned", 1, len(bytes))
+		return
+	}
 }
 
 func TestSelector_withAnyElement_withPrefix_withSuffix_isSelected_isSuccess(t *testing.T) {
@@ -69,12 +70,12 @@ func TestSelector_withAnyElement_withPrefix_withSuffix_isSelected_isSuccess(t *t
 		return
 	}
 
-    selector := `
+	selector := `
 		+ @rootToken .five *
 	`
 
-    bytes, err := NewApplication().Execute(selector, result)
-    if err != nil {
+	bytes, err := NewApplication().Execute(selector, result)
+	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
@@ -110,12 +111,12 @@ func TestSelector_afterSmallerThan_withAnyElement_withPrefix_withSuffix_isSelect
 		return
 	}
 
-    selector := `
+	selector := `
 		+ @rootToken .smallerThan *
 	`
 
-    bytes, err := NewApplication().Execute(selector, result)
-    if err != nil {
+	bytes, err := NewApplication().Execute(selector, result)
+	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
@@ -126,7 +127,6 @@ func TestSelector_afterSmallerThan_withAnyElement_withPrefix_withSuffix_isSelect
 		return
 	}
 }
-
 
 func TestSelector_withRecursiveToken_afterSmallerThan_withAnyElement_withPrefix_withSuffix_isSelected_isSuccess(t *testing.T) {
 	schema := `
@@ -153,12 +153,12 @@ func TestSelector_withRecursiveToken_afterSmallerThan_withAnyElement_withPrefix_
 		return
 	}
 
-    selector := `
+	selector := `
 		+ @rootToken @rootToken .smallerThan *
 	`
 
-    bytes, err := NewApplication().Execute(selector, result)
-    if err != nil {
+	bytes, err := NewApplication().Execute(selector, result)
+	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}

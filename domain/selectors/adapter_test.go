@@ -1,8 +1,6 @@
 package selectors
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestSelectorAdapter_isName_isNotSelected_Success(t *testing.T) {
 	script := `
