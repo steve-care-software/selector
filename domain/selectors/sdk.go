@@ -55,7 +55,7 @@ func NewNameBuilder() NameBuilder {
 // Adapter represents the selector adapter
 type Adapter interface {
 	ToScript(selector Selector) []byte
-	ToSelector(script []byte) (Selector, error)
+	ToSelector(script string) (Selector, error)
 }
 
 // Builder represents a selector builder
@@ -91,22 +91,13 @@ type AnyElementBuilder interface {
 	Create() AnyElementBuilder
 	IsSelected() AnyElementBuilder
 	WithPrefix(prefix Name) AnyElementBuilder
-	WithSuffix(suffix Name) AnyElementBuilder
 	Now() (AnyElement, error)
 }
 
 // AnyElement represents an any element
 type AnyElement interface {
 	IsSelected() bool
-	Content() Content
-}
-
-// Content represents an anyElement content
-type Content interface {
-	HasPrefix() bool
 	Prefix() Name
-	HasSuffix() bool
-	Suffix() Name
 }
 
 // NameBuilder represents a name builder

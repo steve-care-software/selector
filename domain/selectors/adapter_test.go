@@ -10,7 +10,7 @@ func TestSelectorAdapter_isName_isNotSelected_Success(t *testing.T) {
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
+	selector, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -50,7 +50,7 @@ func TestSelectorAdapter_isName_isSelected_Success(t *testing.T) {
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
+	selector, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -90,7 +90,7 @@ func TestSelectorAdapter_isName_isSelected_withInsideNames_Success(t *testing.T)
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
+	selector, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -140,105 +140,13 @@ func TestSelectorAdapter_isName_isSelected_withInsideNames_Success(t *testing.T)
 	}
 }
 
-func TestSelectorAdapter_isAny_withPrefix_withSuffix_withSelect_Success(t *testing.T) {
+func TestSelectorAdapter_isAny_withPrefix_isSelect_Success(t *testing.T) {
 	script := `
-		+ @firstInside @secondInside .myToken +* @firstInside .secondToken
+		@firstInside @secondInside .myToken +*
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
-		t.Errorf("the element was expected to contain an Any")
-		return
-	}
-
-	if elements[0].IsName() {
-		t.Errorf("the element was expected to NOT contain a name")
-		return
-	}
-
-	any := elements[0].Any()
-	if !any.IsSelected() {
-		t.Errorf("the any was expected to be selected")
-		return
-	}
-
-	content := any.Content()
-	if !content.HasPrefix() {
-		t.Errorf("the any was expected to contain a prefix")
-		return
-	}
-
-	if !content.HasSuffix() {
-		t.Errorf("the any was expected to contain a suffix")
-		return
-	}
-}
-
-func TestSelectorAdapter_isAny_withPrefix_withSuffix_withoutSelect_Success(t *testing.T) {
-	script := `
-		+ @firstInside @secondInside .myToken * @firstInside .secondToken
-	`
-
-	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
-		t.Errorf("the element was expected to contain an Any")
-		return
-	}
-
-	if elements[0].IsName() {
-		t.Errorf("the element was expected to NOT contain a name")
-		return
-	}
-
-	any := elements[0].Any()
-	if any.IsSelected() {
-		t.Errorf("the any was expecting to NOT be selected")
-		return
-	}
-
-	content := any.Content()
-	if !content.HasPrefix() {
-		t.Errorf("the any was expected to contain a prefix")
-		return
-	}
-
-	if !content.HasSuffix() {
-		t.Errorf("the any was expected to contain a suffix")
-		return
-	}
-}
-
-func TestSelectorAdapter_isAny_withPrefix_withoutSuffix_isSelect_Success(t *testing.T) {
-	script := `
-		+ @firstInside @secondInside .myToken +*
-	`
-
-	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
+	selector, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -266,25 +174,20 @@ func TestSelectorAdapter_isAny_withPrefix_withoutSuffix_isSelect_Success(t *test
 		return
 	}
 
-	content := any.Content()
-	if !content.HasPrefix() {
-		t.Errorf("the any was expected to contain a prefix")
-		return
-	}
-
-	if content.HasSuffix() {
-		t.Errorf("the any was expected to NOT contain a suffix")
+	prefix := any.Prefix().Name()
+	if prefix != "myToken" {
+		t.Errorf("the prefix was expected to be '%s', '%s' returned", "myToken", prefix)
 		return
 	}
 }
 
-func TestSelectorAdapter_isAny_withPrefix_withoutSuffix_isNOTSelect_Success(t *testing.T) {
+func TestSelectorAdapter_isAny_withPrefix_isNOTSelect_Success(t *testing.T) {
 	script := `
-		+ @firstInside @secondInside .myToken *
+		@firstInside @secondInside .myToken *
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
+	selector, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -312,198 +215,9 @@ func TestSelectorAdapter_isAny_withPrefix_withoutSuffix_isNOTSelect_Success(t *t
 		return
 	}
 
-	content := any.Content()
-	if !content.HasPrefix() {
-		t.Errorf("the any was expected to contain a prefix")
-		return
-	}
-
-	if content.HasSuffix() {
-		t.Errorf("the any was expected to NOT contain a suffix")
-		return
-	}
-}
-
-func TestSelectorAdapter_isAny_withoutPrefix_withSuffix_isSelect_Success(t *testing.T) {
-	script := `
-		+* @firstInside .secondToken
-	`
-
-	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
-		t.Errorf("the element was expected to contain an Any")
-		return
-	}
-
-	if elements[0].IsName() {
-		t.Errorf("the element was expected to NOT contain a name")
-		return
-	}
-
-	any := elements[0].Any()
-	if !any.IsSelected() {
-		t.Errorf("the any was expecting to be selected")
-		return
-	}
-
-	content := any.Content()
-	if content.HasPrefix() {
-		t.Errorf("the any was expected to NOT contain a prefix")
-		return
-	}
-
-	if !content.HasSuffix() {
-		t.Errorf("the any was expected to contain a suffix")
-		return
-	}
-}
-
-func TestSelectorAdapter_isAny_withoutPrefix_withSuffix_isNotSelect_Success(t *testing.T) {
-	script := `
-		* @firstInside .secondToken
-	`
-
-	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
-		t.Errorf("the element was expected to contain an Any")
-		return
-	}
-
-	if elements[0].IsName() {
-		t.Errorf("the element was expected to NOT contain a name")
-		return
-	}
-
-	any := elements[0].Any()
-	if any.IsSelected() {
-		t.Errorf("the any was expecting to NOT be selected")
-		return
-	}
-
-	content := any.Content()
-	if content.HasPrefix() {
-		t.Errorf("the any was expected to NOT contain a prefix")
-		return
-	}
-
-	if !content.HasSuffix() {
-		t.Errorf("the any was expected to contain a suffix")
-		return
-	}
-}
-
-func TestSelectorAdapter_isAny_withoutPrefix_withoutSuffix_isSelect_Success(t *testing.T) {
-	script := `
-		+*
-	`
-
-	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
-		t.Errorf("the element was expected to contain an Any")
-		return
-	}
-
-	if elements[0].IsName() {
-		t.Errorf("the element was expected to NOT contain a name")
-		return
-	}
-
-	any := elements[0].Any()
-	if !any.IsSelected() {
-		t.Errorf("the any was expecting to be selected")
-		return
-	}
-
-	content := any.Content()
-	if content.HasPrefix() {
-		t.Errorf("the any was expected to NOT contain a prefix")
-		return
-	}
-
-	if content.HasSuffix() {
-		t.Errorf("the any was expected to NOT contain a suffix")
-		return
-	}
-}
-
-func TestSelectorAdapter_isAny_withoutPrefix_withoutSuffix_isNOTSelect_Success(t *testing.T) {
-	script := `
-		*
-	`
-
-	adapter := NewAdapter()
-	selector, err := adapter.ToSelector([]byte(script))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
-		t.Errorf("the element was expected to contain an Any")
-		return
-	}
-
-	if elements[0].IsName() {
-		t.Errorf("the element was expected to NOT contain a name")
-		return
-	}
-
-	any := elements[0].Any()
-	if any.IsSelected() {
-		t.Errorf("the any was expecting to NOT be selected")
-		return
-	}
-
-	content := any.Content()
-	if content.HasPrefix() {
-		t.Errorf("the any was expected to NOT contain a prefix")
-		return
-	}
-
-	if content.HasSuffix() {
-		t.Errorf("the any was expected to NOT contain a suffix")
+	prefix := any.Prefix().Name()
+	if prefix != "myToken" {
+		t.Errorf("the prefix was expected to be '%s', '%s' returned", "myToken", prefix)
 		return
 	}
 }

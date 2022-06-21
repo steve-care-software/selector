@@ -1,16 +1,18 @@
 package selectors
 
+import(
+	"errors"
+)
+
 type anyElementBuilder struct {
 	isSelected bool
 	prefix     Name
-	suffix     Name
 }
 
 func createAnyElementBuilder() AnyElementBuilder {
 	out := anyElementBuilder{
 		isSelected: false,
 		prefix:     nil,
-		suffix:     nil,
 	}
 
 	return &out
@@ -33,29 +35,11 @@ func (app *anyElementBuilder) WithPrefix(prefix Name) AnyElementBuilder {
 	return app
 }
 
-// WithSuffix adds a suffix to the builder
-func (app *anyElementBuilder) WithSuffix(suffix Name) AnyElementBuilder {
-	app.suffix = suffix
-	return app
-}
-
 // Now builds a new AnyElement instance
 func (app *anyElementBuilder) Now() (AnyElement, error) {
-	if app.prefix != nil && app.suffix != nil {
-		content := createContentWithPrefixAndSuffix(app.prefix, app.suffix)
-		return createAnyElement(app.isSelected, content), nil
+	if app.prefix == nil {
+		return nil, errors.New("the prefix is mandatory in order to build an AnyElement instance")
 	}
-
-	if app.prefix != nil {
-		content := createContentWithPrefix(app.prefix)
-		return createAnyElement(app.isSelected, content), nil
-	}
-
-	if app.suffix != nil {
-		content := createContentWithSuffix(app.suffix)
-		return createAnyElement(app.isSelected, content), nil
-	}
-
-	content := createContent()
-	return createAnyElement(app.isSelected, content), nil
+	
+	return createAnyElement(app.isSelected, app.prefix), nil
 }

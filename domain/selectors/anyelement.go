@@ -2,16 +2,16 @@ package selectors
 
 type anyElement struct {
 	isSelected bool
-	content    Content
+	prefix Name
 }
 
 func createAnyElement(
 	isSelected bool,
-	content Content,
+	prefix Name,
 ) AnyElement {
 	out := anyElement{
 		isSelected: isSelected,
-		content:    content,
+		prefix:    prefix,
 	}
 
 	return &out
@@ -22,7 +22,7 @@ func (obj *anyElement) IsSelected() bool {
 	return obj.isSelected
 }
 
-// Content returns the content
-func (obj *anyElement) Content() Content {
-	return obj.content
+// Prefix returns the prefix
+func (obj *anyElement) Prefix() Name {
+	return obj.prefix
 }

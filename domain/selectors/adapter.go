@@ -52,7 +52,7 @@ func (app *adapter) ToScript(selector Selector) []byte {
 }
 
 // ToSelector converts a script to selector
-func (app *adapter) ToSelector(script []byte) (Selector, error) {
+func (app *adapter) ToSelector(script string) (Selector, error) {
 	// convert to bytes:
 	bytes := []byte(script)
 
@@ -164,20 +164,16 @@ func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
 	isAny := false
 	isSelected := false
 	prefixData := []byte{}
-	suffixData := []byte{}
 	for idx, value := range data {
 		if value == app.anyByte {
 			isAny = true
 			beforeIdx := idx
-			increment := 1
 			if prevVal == app.selectByte {
 				isSelected = true
 				beforeIdx = idx - 1
-				increment = 2
 			}
 
 			prefixData = data[0:beforeIdx]
-			suffixData = data[beforeIdx+increment:]
 			break
 		}
 
@@ -193,24 +189,15 @@ func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
 		anyElementBuilder.IsSelected()
 	}
 
+	remainingAfterPrefix := prefixData
 	if len(prefixData) > 0 {
-		prefix, _, err := app.retrieveElementName(prefixData)
+		prefix, remaining, err := app.retrieveElementName(prefixData)
 		if err != nil {
 			return nil, nil, err
 		}
 
+		remainingAfterPrefix = remaining
 		anyElementBuilder.WithPrefix(prefix)
-	}
-
-	remainingAfterSuffix := suffixData
-	if len(suffixData) > 0 {
-		suffix, remaining, err := app.retrieveElementName(suffixData)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		remainingAfterSuffix = remaining
-		anyElementBuilder.WithSuffix(suffix)
 	}
 
 	any, err := anyElementBuilder.Now()
@@ -223,7 +210,7 @@ func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
 		return nil, nil, err
 	}
 
-	return ins, remainingAfterSuffix, nil
+	return ins, remainingAfterPrefix, nil
 }
 
 func (app *adapter) retrieveTokenName(data []byte, prefixByte byte) (string, []byte, error) {
