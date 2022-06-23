@@ -29,7 +29,7 @@ func (app *application) Compile(script string) (selectors.Selector, error) {
 }
 
 // Execute executes a selector on validation result
-func (app *application) Execute(selector selectors.Selector, result results.Result) ([]byte, error) {
+func (app *application) Execute(selector selectors.Selector, result results.Result) ([][]byte, error) {
 	if !result.Token().IsSuccess() {
 		return nil, errors.New("the selector cannot extract result tokens because the result is invalid")
 	}
@@ -39,8 +39,8 @@ func (app *application) Execute(selector selectors.Selector, result results.Resu
 	return app.elementsOnToken(list, token)
 }
 
-func (app *application) elementsOnToken(elements []selectors.Element, token results.Token) ([]byte, error) {
-	output := []byte{}
+func (app *application) elementsOnToken(elements []selectors.Element, token results.Token) ([][]byte, error) {
+	output := [][]byte{}
 	for _, oneElement := range elements {
 		bytes, err := app.elementOnToken(oneElement, token)
 		if err != nil {
@@ -55,7 +55,7 @@ func (app *application) elementsOnToken(elements []selectors.Element, token resu
 	return output, nil
 }
 
-func (app *application) elementOnToken(element selectors.Element, token results.Token) ([]byte, error) {
+func (app *application) elementOnToken(element selectors.Element, token results.Token) ([][]byte, error) {
 	if element.IsName() {
 		name := element.Name()
 		return app.nameInsOnToken(name, token)
@@ -65,7 +65,7 @@ func (app *application) elementOnToken(element selectors.Element, token results.
 	return app.anyElementOnToken(anyElement, token)
 }
 
-func (app *application) nameInsOnToken(nameIns selectors.Name, token results.Token) ([]byte, error) {
+func (app *application) nameInsOnToken(nameIns selectors.Name, token results.Token) ([][]byte, error) {
 	name := nameIns.Name()
 	path := []string{}
 	if nameIns.HasInsideNames() {
@@ -73,37 +73,37 @@ func (app *application) nameInsOnToken(nameIns selectors.Name, token results.Tok
 	}
 
 	path = append(path, name)
-	isFound, bytes, err := app.nameOnToken(path, token)
+	bytes, _, err := app.nameOnToken(path, token)
 	if err != nil {
 		return nil, err
 	}
 
-	if isFound && nameIns.IsSelected() {
+	if nameIns.IsSelected() {
 		return bytes, nil
 	}
 
 	return nil, nil
 }
 
-func (app *application) nameOnToken(path []string, token results.Token) (bool, []byte, error) {
+func (app *application) nameOnToken(path []string, token results.Token) ([][]byte, bool, error) {
 	block := token.Block()
 	if !block.IsSuccess() {
 		str := fmt.Sprintf("the block's token (name: %s) is NOT successful and therefore its value cannot be extracted", token.Name())
-		return false, nil, errors.New(str)
+		return nil, false, errors.New(str)
 	}
 
 	if len(path) <= 0 {
-		return false, nil, nil
+		return nil, false, errors.New("the path is mandatory in order to retrieve the token's value, none provided")
 	}
 
 	name := path[0]
-	isFound := token.Name() == name
 	currentPath := path
-	if isFound {
+	if token.Name() == name {
 		currentPath = path[1:]
 	}
 
-	output := []byte{}
+	isSameLine := false
+	output := [][]byte{}
 	lines := block.List()
 	for _, oneLine := range lines {
 		if !oneLine.IsSuccess() {
@@ -120,71 +120,98 @@ func (app *application) nameOnToken(path []string, token results.Token) (bool, [
 				continue
 			}
 
+			data := []byte{}
 			matches := oneElementWithCardinality.Matches()
 			for _, oneElement := range matches {
 				if oneElement.IsValue() {
+					if len(currentPath) > 0 {
+						continue
+					}
+
 					pValue := oneElement.Value()
-					output = append(output, *pValue)
+					data = append(data, *pValue)
+					isSameLine = true
 					continue
 				}
 
 				if oneElement.IsToken() {
 					elementToken := oneElement.Token()
-					isTokenFound, tokenBytes, err := app.nameOnToken(currentPath, elementToken)
-					if err != nil {
-						return false, nil, err
-					}
+					if len(currentPath) > 0 {
+						tokenBytes, tokenIsSameLine, err := app.nameOnToken(currentPath, elementToken)
+						if err != nil {
+							return nil, false, err
+						}
 
-					if tokenBytes == nil {
+						if len(tokenBytes) <= 0 {
+							continue
+						}
+
+						if tokenIsSameLine {
+							for _, oneLine := range tokenBytes {
+								data = append(data, oneLine...)
+							}
+
+							continue
+						}
+
+						output = append(output, tokenBytes...)
 						continue
 					}
 
-					output = append(output, tokenBytes...)
-					if isTokenFound {
-						isFound = true
-						break
-					}
-
+					elementBlock := elementToken.Block()
+					index := elementBlock.Discovered()
+					input := elementBlock.Input()
+					remaining := elementBlock.Remaining()
+					amount := len(input) - len(remaining)
+					data = append(data, input[index:amount]...)
+					isSameLine = true
 					continue
 				}
+
 			}
 
-			if isFound && len(output) > 0 {
-				break
+			if len(data) <= 0 {
+				continue
 			}
+
+			output = append(output, data)
 		}
+
 	}
 
-	if isFound {
-		return isFound, output, nil
-	}
-
-	return false, nil, nil
+	return output, isSameLine, nil
 }
 
-func (app *application) anyElementOnToken(anyElement selectors.AnyElement, token results.Token) ([]byte, error) {
+func (app *application) anyElementOnToken(anyElement selectors.AnyElement, token results.Token) ([][]byte, error) {
 	block := token.Block()
 	input := block.Input()
 	index := block.Discovered()
 	prefixName := anyElement.Prefix()
-	prefix, err := app.nameInsOnToken(prefixName, token)
+	prefixes, err := app.nameInsOnToken(prefixName, token)
 	if err != nil {
 		return nil, err
 	}
 
-	stop := false
 	data := input[index:]
-	output := input[index:]
-	for idx := range data {
-		if bytes.HasPrefix(output, prefix) {
-			stop = true
+	list := [][]byte{}
+	for _, onePrefix := range prefixes {
+		element := data
+		for idx := range data {
+			element = data[idx:]
+			if bytes.HasPrefix(element, onePrefix) {
+				break
+			}
 		}
 
-		output = data[idx+1:]
-		if stop {
-			break
+		value := []byte{}
+		index := len(data) - len(element) + 1
+		if len(data) >= index {
+			value = data[index:]
 		}
+
+		list = append(list, value)
+		data = value
 	}
 
-	return output, nil
+	return list, nil
 }
