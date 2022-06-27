@@ -3,6 +3,8 @@ package selectors
 import (
 	"errors"
 	"fmt"
+
+	"github.com/steve-care-software/validator/domain/utils"
 )
 
 type adapter struct {
@@ -181,7 +183,12 @@ func (app *adapter) retrieveTokenName(data []byte, prefixByte byte) (string, []b
 	}
 
 	if data[0] == prefixByte {
-		return app.fetchTokenName(data[1:])
+		tokenName, remainingAfterTokenName, err := app.fetchTokenName(data[1:])
+		if err != nil {
+			return "", nil, err
+		}
+
+		return tokenName, remainingAfterTokenName, nil
 	}
 
 	str := fmt.Sprintf("the tokenName was expecting a prefix byte (%d), none provided", prefixByte)
@@ -191,7 +198,7 @@ func (app *adapter) retrieveTokenName(data []byte, prefixByte byte) (string, []b
 func (app *adapter) removeChannelCharacters(input []byte) []byte {
 	output := []byte{}
 	for _, oneInputByte := range input {
-		if app.isBytePresent(oneInputByte, app.channelCharacters) {
+		if utils.IsBytePresent(oneInputByte, app.channelCharacters) {
 			continue
 		}
 
@@ -201,22 +208,10 @@ func (app *adapter) removeChannelCharacters(input []byte) []byte {
 	return output
 }
 
-func (app *adapter) isBytePresent(value byte, data []byte) bool {
-	isPresent := false
-	for _, oneChanByte := range data {
-		if value == oneChanByte {
-			isPresent = true
-			break
-		}
-	}
-
-	return isPresent
-}
-
 func (app *adapter) fetchTokenName(input []byte) (string, []byte, error) {
 	nameBytes := []byte{}
 	for _, oneInputByte := range input {
-		if !app.isBytePresent(oneInputByte, app.tokenNameCharacters) {
+		if !utils.IsBytePresent(oneInputByte, app.tokenNameCharacters) {
 			break
 		}
 

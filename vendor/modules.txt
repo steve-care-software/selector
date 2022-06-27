@@ -1,4 +1,4 @@
-# github.com/steve-care-software/validator v0.0.2
+# github.com/steve-care-software/validator v0.0.3
 ## explicit
 github.com/steve-care-software/validator/applications
 github.com/steve-care-software/validator/domain/grammars

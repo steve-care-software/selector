@@ -150,7 +150,6 @@ func (app *application) nameOnToken(path []string, token results.Token) ([][]byt
 					isSameLine = true
 					continue
 				}
-
 			}
 
 			if len(data) <= 0 {
@@ -159,7 +158,6 @@ func (app *application) nameOnToken(path []string, token results.Token) ([][]byt
 
 			output = append(output, data)
 		}
-
 	}
 
 	return output, isSameLine, nil
@@ -196,4 +194,21 @@ func (app *application) anyNameOnToken(anyElement selectors.Name, token results.
 	}
 
 	return list, nil
+}
+
+func (app *application) getIndexes(amount uint8, min uint8, pMax *uint8) (int, int) {
+	max := amount - 1
+	if pMax == nil {
+		return int(min), int(max)
+	}
+
+	if max > *pMax {
+		max = *pMax
+	}
+
+	if max < min {
+		max = min
+	}
+
+	return int(min), int(max)
 }
