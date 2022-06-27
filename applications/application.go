@@ -110,8 +110,8 @@ func (app *application) nameOnToken(path []string, token results.Token) ([][]byt
 			continue
 		}
 
-		elementsWithCardinality := oneLine.Elements()
-		for _, oneElementWithCardinality := range elementsWithCardinality {
+		elements := oneLine.Elements()
+		for _, oneElementWithCardinality := range elements {
 			if !oneElementWithCardinality.IsSuccess() {
 				continue
 			}
@@ -182,12 +182,11 @@ func (app *application) nameOnToken(path []string, token results.Token) ([][]byt
 	return output, isSameLine, nil
 }
 
-func (app *application) anyElementOnToken(anyElement selectors.AnyElement, token results.Token) ([][]byte, error) {
+func (app *application) anyElementOnToken(anyElement selectors.Name, token results.Token) ([][]byte, error) {
 	block := token.Block()
 	input := block.Input()
 	index := block.Discovered()
-	prefixName := anyElement.Prefix()
-	prefixes, err := app.nameInsOnToken(prefixName, token)
+	prefixes, err := app.nameInsOnToken(anyElement, token)
 	if err != nil {
 		return nil, err
 	}

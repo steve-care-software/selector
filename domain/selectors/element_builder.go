@@ -4,7 +4,7 @@ import "errors"
 
 type elementBuilder struct {
 	name Name
-	any  AnyElement
+	any  Name
 }
 
 func createElementBuilder() ElementBuilder {
@@ -28,7 +28,7 @@ func (app *elementBuilder) WithName(name Name) ElementBuilder {
 }
 
 // WithAny adds an anyElement to the builder
-func (app *elementBuilder) WithAny(any AnyElement) ElementBuilder {
+func (app *elementBuilder) WithAny(any Name) ElementBuilder {
 	app.any = any
 	return app
 }

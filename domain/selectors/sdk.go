@@ -4,7 +4,6 @@ package selectors
 func NewAdapter() Adapter {
 	selectorBuilder := NewBuilder()
 	elementBuilder := NewElementBuilder()
-	anyElementBuilder := NewAnyElementBuilder()
 	nameBuilder := NewNameBuilder()
 	anyByte := []byte("*")[0]
 	tokenNameByte := []byte(".")[0]
@@ -21,7 +20,6 @@ func NewAdapter() Adapter {
 	return createAdapter(
 		selectorBuilder,
 		elementBuilder,
-		anyElementBuilder,
 		nameBuilder,
 		anyByte,
 		tokenNameByte,
@@ -40,11 +38,6 @@ func NewBuilder() Builder {
 // NewElementBuilder creates a new element builder
 func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
-}
-
-// NewAnyElementBuilder creates a new anyElement builder
-func NewAnyElementBuilder() AnyElementBuilder {
-	return createAnyElementBuilder()
 }
 
 // NewNameBuilder creates a new name builder
@@ -74,7 +67,7 @@ type Selector interface {
 type ElementBuilder interface {
 	Create() ElementBuilder
 	WithName(name Name) ElementBuilder
-	WithAny(any AnyElement) ElementBuilder
+	WithAny(any Name) ElementBuilder
 	Now() (Element, error)
 }
 
@@ -83,21 +76,7 @@ type Element interface {
 	IsName() bool
 	Name() Name
 	IsAny() bool
-	Any() AnyElement
-}
-
-// AnyElementBuilder represents an any element builder
-type AnyElementBuilder interface {
-	Create() AnyElementBuilder
-	IsSelected() AnyElementBuilder
-	WithPrefix(prefix Name) AnyElementBuilder
-	Now() (AnyElement, error)
-}
-
-// AnyElement represents an any element
-type AnyElement interface {
-	IsSelected() bool
-	Prefix() Name
+	Any() Name
 }
 
 // NameBuilder represents a name builder

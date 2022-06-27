@@ -25,7 +25,14 @@ func TestSelector_withInsideNames_withName_isSuccess(t *testing.T) {
 	`
 
 	data := []byte("5 < 5")
-	result, err := validator.NewApplication().Execute(schema, data, true)
+	validatorApp := validator.NewApplication()
+	validator, err := validatorApp.Compile(schema)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := validatorApp.Execute(validator, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -72,7 +79,14 @@ func TestSelector_withAnyElement_withPrefix_withSuffix_isSelected_isSuccess(t *t
 	`
 
 	data := []byte("5 < 5")
-	result, err := validator.NewApplication().Execute(schema, data, true)
+	validatorApp := validator.NewApplication()
+	validator, err := validatorApp.Compile(schema)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := validatorApp.Execute(validator, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -131,7 +145,14 @@ func TestSelector_afterSmallerThan_withAnyElement_withPrefix_withSuffix_isSelect
 	`
 
 	data := []byte("5 < 5")
-	result, err := validator.NewApplication().Execute(schema, data, true)
+	validatorApp := validator.NewApplication()
+	validator, err := validatorApp.Compile(schema)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := validatorApp.Execute(validator, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -190,7 +211,14 @@ func TestSelector_withRecursiveToken_afterSmallerThan_withAnyElement_withPrefix_
 	`
 
 	data := []byte("(( 5 < 5 ))")
-	result, err := validator.NewApplication().Execute(schema, data, true)
+	validatorApp := validator.NewApplication()
+	validator, err := validatorApp.Compile(schema)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := validatorApp.Execute(validator, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -275,7 +303,14 @@ func TestSelector_withBytes_isSuccess(t *testing.T) {
 	`
 
 	data := []byte("[$100; $20; $30;]")
-	result, err := validator.NewApplication().Execute(schema, data, true)
+	validatorApp := validator.NewApplication()
+	validator, err := validatorApp.Compile(schema)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := validatorApp.Execute(validator, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -362,7 +397,14 @@ func TestSelector_withByte_isSuccess(t *testing.T) {
 	`
 
 	data := []byte("$100")
-	result, err := validator.NewApplication().Execute(schema, data, true)
+	validatorApp := validator.NewApplication()
+	validator, err := validatorApp.Compile(schema)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := validatorApp.Execute(validator, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

@@ -2,7 +2,7 @@ package selectors
 
 type element struct {
 	name Name
-	any  AnyElement
+	any  Name
 }
 
 func createElementWithName(
@@ -12,14 +12,14 @@ func createElementWithName(
 }
 
 func createElementWithAnyElement(
-	any AnyElement,
+	any Name,
 ) Element {
 	return createElementInternally(nil, any)
 }
 
 func createElementInternally(
 	name Name,
-	any AnyElement,
+	any Name,
 ) Element {
 	out := element{
 		name: name,
@@ -45,6 +45,6 @@ func (obj *element) IsAny() bool {
 }
 
 // Any returns the anyElement, if any
-func (obj *element) Any() AnyElement {
+func (obj *element) Any() Name {
 	return obj.any
 }

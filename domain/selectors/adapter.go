@@ -8,7 +8,6 @@ import (
 type adapter struct {
 	builder             Builder
 	elementBuilder      ElementBuilder
-	anyElementBuilder   AnyElementBuilder
 	nameBuilder         NameBuilder
 	anyByte             byte
 	tokenNameByte       byte
@@ -21,7 +20,6 @@ type adapter struct {
 func createAdapter(
 	builder Builder,
 	elementBuilder ElementBuilder,
-	anyElementBuilder AnyElementBuilder,
 	nameBuilder NameBuilder,
 	anyByte byte,
 	tokenNameByte byte,
@@ -33,7 +31,6 @@ func createAdapter(
 	out := adapter{
 		builder:             builder,
 		elementBuilder:      elementBuilder,
-		anyElementBuilder:   anyElementBuilder,
 		nameBuilder:         nameBuilder,
 		anyByte:             anyByte,
 		tokenNameByte:       tokenNameByte,
@@ -160,35 +157,23 @@ func (app *adapter) elementIsSelected(data []byte) (bool, []byte) {
 }
 
 func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
-	prevVal := byte(0)
 	isAny := false
-	isSelected := false
 	prefixData := []byte{}
 	for idx, value := range data {
-		if value == app.anyByte {
-			isAny = true
-			beforeIdx := idx
-			if prevVal == app.selectByte {
-				isSelected = true
-				beforeIdx = idx - 1
-			}
-
-			prefixData = data[0:beforeIdx]
-			break
+		if value != app.anyByte {
+			continue
 		}
 
-		prevVal = value
+		isAny = true
+		prefixData = data[0:idx]
+		break
 	}
 
 	if !isAny {
 		return nil, nil, errors.New("the given data does not represent an AnyElement instance")
 	}
 
-	anyElementBuilder := app.anyElementBuilder.Create()
-	if isSelected {
-		anyElementBuilder.IsSelected()
-	}
-
+	elementBuilder := app.elementBuilder.Create()
 	remainingAfterPrefix := prefixData
 	if len(prefixData) > 0 {
 		prefix, remaining, err := app.retrieveElementName(prefixData)
@@ -197,15 +182,10 @@ func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
 		}
 
 		remainingAfterPrefix = remaining
-		anyElementBuilder.WithPrefix(prefix)
+		elementBuilder.WithAny(prefix)
 	}
 
-	any, err := anyElementBuilder.Now()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	ins, err := app.elementBuilder.Create().WithAny(any).Now()
+	ins, err := elementBuilder.Now()
 	if err != nil {
 		return nil, nil, err
 	}

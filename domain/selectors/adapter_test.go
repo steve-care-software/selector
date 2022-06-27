@@ -140,7 +140,7 @@ func TestSelectorAdapter_isName_isSelected_withInsideNames_Success(t *testing.T)
 
 func TestSelectorAdapter_isAny_withPrefix_isSelect_Success(t *testing.T) {
 	script := `
-		@firstInside @secondInside .myToken +*
+		+ @firstInside @secondInside .myToken *
 	`
 
 	adapter := NewAdapter()
@@ -172,7 +172,7 @@ func TestSelectorAdapter_isAny_withPrefix_isSelect_Success(t *testing.T) {
 		return
 	}
 
-	prefix := any.Prefix().Name()
+	prefix := any.Name()
 	if prefix != "myToken" {
 		t.Errorf("the prefix was expected to be '%s', '%s' returned", "myToken", prefix)
 		return
@@ -213,7 +213,7 @@ func TestSelectorAdapter_isAny_withPrefix_isNOTSelect_Success(t *testing.T) {
 		return
 	}
 
-	prefix := any.Prefix().Name()
+	prefix := any.Name()
 	if prefix != "myToken" {
 		t.Errorf("the prefix was expected to be '%s', '%s' returned", "myToken", prefix)
 		return

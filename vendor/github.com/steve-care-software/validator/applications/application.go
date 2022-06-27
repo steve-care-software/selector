@@ -11,7 +11,7 @@ import (
 )
 
 type application struct {
-	grammarAdapter 						grammars.Adapter
+	grammarAdapter                      grammars.Adapter
 	resultBuilder                       results.Builder
 	resultTokenBuilder                  results.TokenBuilder
 	resultBlockBuilder                  results.BlockBuilder
@@ -30,7 +30,7 @@ func createApplication(
 	resultElementBuilder results.ElementBuilder,
 ) Application {
 	out := application{
-		grammarAdapter: 					 grammarAdapter,
+		grammarAdapter:                      grammarAdapter,
 		resultBuilder:                       resultBuilder,
 		resultTokenBuilder:                  resultTokenBuilder,
 		resultBlockBuilder:                  resultBlockBuilder,
@@ -42,13 +42,13 @@ func createApplication(
 	return &out
 }
 
-// Execute executes the application
-func (app *application) Execute(script string, data []byte, canHavePrefix bool) (results.Result, error) {
-	grammar, err := app.grammarAdapter.ToGrammar(script)
-	if err != nil {
-		return nil, err
-	}
+// Compile compiles a script to a validator grammar
+func (app *application) Compile(script string) (grammars.Grammar, error) {
+	return app.grammarAdapter.ToGrammar(script)
+}
 
+// Execute executes the application
+func (app *application) Execute(grammar grammars.Grammar, data []byte, canHavePrefix bool) (results.Result, error) {
 	token := grammar.Root()
 	channels := grammar.Channels()
 	if canHavePrefix {
