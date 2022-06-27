@@ -3,7 +3,6 @@ package selectors
 // NewAdapter creates a new selector adapter instance
 func NewAdapter() Adapter {
 	selectorBuilder := NewBuilder()
-	elementBuilder := NewElementBuilder()
 	nameBuilder := NewNameBuilder()
 	anyByte := []byte("*")[0]
 	tokenNameByte := []byte(".")[0]
@@ -19,7 +18,6 @@ func NewAdapter() Adapter {
 
 	return createAdapter(
 		selectorBuilder,
-		elementBuilder,
 		nameBuilder,
 		anyByte,
 		tokenNameByte,
@@ -35,11 +33,6 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// NewElementBuilder creates a new element builder
-func NewElementBuilder() ElementBuilder {
-	return createElementBuilder()
-}
-
 // NewNameBuilder creates a new name builder
 func NewNameBuilder() NameBuilder {
 	return createNameBuilder()
@@ -48,31 +41,19 @@ func NewNameBuilder() NameBuilder {
 // Adapter represents the selector adapter
 type Adapter interface {
 	ToScript(selector Selector) []byte
-	ToSelector(script string) (Selector, error)
+	ToSelector(script string) (Selector, []byte, error)
 }
 
 // Builder represents a selector builder
 type Builder interface {
 	Create() Builder
-	WithList(list []Element) Builder
+	WithName(name Name) Builder
+	WithAny(any Name) Builder
 	Now() (Selector, error)
 }
 
-// Selector represents a selector
+// Selector represents a selector element
 type Selector interface {
-	List() []Element
-}
-
-// ElementBuilder represents an element builder
-type ElementBuilder interface {
-	Create() ElementBuilder
-	WithName(name Name) ElementBuilder
-	WithAny(any Name) ElementBuilder
-	Now() (Element, error)
-}
-
-// Element represents a selector element
-type Element interface {
 	IsName() bool
 	Name() Name
 	IsAny() bool

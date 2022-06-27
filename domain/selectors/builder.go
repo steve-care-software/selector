@@ -3,12 +3,14 @@ package selectors
 import "errors"
 
 type builder struct {
-	list []Element
+	name Name
+	any  Name
 }
 
 func createBuilder() Builder {
 	out := builder{
-		list: nil,
+		name: nil,
+		any:  nil,
 	}
 
 	return &out
@@ -19,21 +21,27 @@ func (app *builder) Create() Builder {
 	return createBuilder()
 }
 
-// WithList adds a list to the builder
-func (app *builder) WithList(list []Element) Builder {
-	app.list = list
+// WithName adds a name to the builder
+func (app *builder) WithName(name Name) Builder {
+	app.name = name
+	return app
+}
+
+// WithAny adds an anySelector to the builder
+func (app *builder) WithAny(any Name) Builder {
+	app.any = any
 	return app
 }
 
 // Now builds a new Selector instance
 func (app *builder) Now() (Selector, error) {
-	if app.list != nil && len(app.list) <= 0 {
-		app.list = nil
+	if app.name != nil {
+		return createSelectorWithName(app.name), nil
 	}
 
-	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Element in order to build an Selector instance")
+	if app.any != nil {
+		return createSelectorWithAnySelector(app.any), nil
 	}
 
-	return createSelector(app.list), nil
+	return nil, errors.New("the Selector is invalid")
 }

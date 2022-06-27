@@ -43,7 +43,7 @@ func TestSelector_withInsideNames_withName_isSuccess(t *testing.T) {
 	`
 
 	application := NewApplication()
-	selectorIns, err := application.Compile(selector)
+	selectorIns, _, err := application.Compile(selector)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -97,7 +97,7 @@ func TestSelector_withAnyElement_withPrefix_withSuffix_isSelected_isSuccess(t *t
 	`
 
 	application := NewApplication()
-	selectorIns, err := application.Compile(selector)
+	selectorIns, _, err := application.Compile(selector)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -163,7 +163,7 @@ func TestSelector_afterSmallerThan_withAnyElement_withPrefix_withSuffix_isSelect
 	`
 
 	application := NewApplication()
-	selectorIns, err := application.Compile(selector)
+	selectorIns, _, err := application.Compile(selector)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -229,7 +229,7 @@ func TestSelector_withRecursiveToken_afterSmallerThan_withAnyElement_withPrefix_
 	`
 
 	application := NewApplication()
-	selectorIns, err := application.Compile(selector)
+	selectorIns, _, err := application.Compile(selector)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -321,7 +321,7 @@ func TestSelector_withBytes_isSuccess(t *testing.T) {
 	`
 
 	application := NewApplication()
-	selectorIns, err := application.Compile(selector)
+	selectorIns, _, err := application.Compile(selector)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -415,7 +415,7 @@ func TestSelector_withByte_isSuccess(t *testing.T) {
 	`
 
 	application := NewApplication()
-	selectorIns, err := application.Compile(selector)
+	selectorIns, _, err := application.Compile(selector)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

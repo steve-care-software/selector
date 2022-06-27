@@ -7,7 +7,6 @@ import (
 
 type adapter struct {
 	builder             Builder
-	elementBuilder      ElementBuilder
 	nameBuilder         NameBuilder
 	anyByte             byte
 	tokenNameByte       byte
@@ -19,7 +18,6 @@ type adapter struct {
 
 func createAdapter(
 	builder Builder,
-	elementBuilder ElementBuilder,
 	nameBuilder NameBuilder,
 	anyByte byte,
 	tokenNameByte byte,
@@ -30,7 +28,6 @@ func createAdapter(
 ) Adapter {
 	out := adapter{
 		builder:             builder,
-		elementBuilder:      elementBuilder,
 		nameBuilder:         nameBuilder,
 		anyByte:             anyByte,
 		tokenNameByte:       tokenNameByte,
@@ -49,7 +46,7 @@ func (app *adapter) ToScript(selector Selector) []byte {
 }
 
 // ToSelector converts a script to selector
-func (app *adapter) ToSelector(script string) (Selector, error) {
+func (app *adapter) ToSelector(script string) (Selector, []byte, error) {
 	// convert to bytes:
 	bytes := []byte(script)
 
@@ -60,24 +57,8 @@ func (app *adapter) ToSelector(script string) (Selector, error) {
 	return app.retrieveSelector(remainingAfterChans)
 }
 
-func (app *adapter) retrieveSelector(data []byte) (Selector, error) {
-	list := []Element{}
-	lastRemaining := data
-	for {
-		retElement, retRemaining, err := app.retrieveElement(lastRemaining)
-		if err != nil {
-			break
-		}
-
-		lastRemaining = retRemaining
-		list = append(list, retElement)
-	}
-
-	return app.builder.Create().WithList(list).Now()
-}
-
-func (app *adapter) retrieveElement(data []byte) (Element, []byte, error) {
-	anyElement, remainingAfterAny, err := app.retrieveAnyElement(data)
+func (app *adapter) retrieveSelector(data []byte) (Selector, []byte, error) {
+	anyElement, remainingAfterAny, err := app.retrieveAnySelector(data)
 	if err == nil {
 		return anyElement, remainingAfterAny, nil
 	}
@@ -87,7 +68,7 @@ func (app *adapter) retrieveElement(data []byte) (Element, []byte, error) {
 		return nil, nil, err
 	}
 
-	ins, err := app.elementBuilder.Create().WithName(name).Now()
+	ins, err := app.builder.Create().WithName(name).Now()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -156,7 +137,7 @@ func (app *adapter) elementIsSelected(data []byte) (bool, []byte) {
 	return false, data
 }
 
-func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
+func (app *adapter) retrieveAnySelector(data []byte) (Selector, []byte, error) {
 	isAny := false
 	prefixData := []byte{}
 	for idx, value := range data {
@@ -173,7 +154,7 @@ func (app *adapter) retrieveAnyElement(data []byte) (Element, []byte, error) {
 		return nil, nil, errors.New("the given data does not represent an AnyElement instance")
 	}
 
-	elementBuilder := app.elementBuilder.Create()
+	elementBuilder := app.builder.Create()
 	remainingAfterPrefix := prefixData
 	if len(prefixData) > 0 {
 		prefix, remaining, err := app.retrieveElementName(prefixData)

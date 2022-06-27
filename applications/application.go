@@ -24,7 +24,7 @@ func createApplication(
 }
 
 // Compile compiles a selector
-func (app *application) Compile(script string) (selectors.Selector, error) {
+func (app *application) Compile(script string) (selectors.Selector, []byte, error) {
 	return app.adapter.ToSelector(script)
 }
 
@@ -34,35 +34,18 @@ func (app *application) Execute(selector selectors.Selector, result results.Resu
 		return nil, errors.New("the selector cannot extract result tokens because the result is invalid")
 	}
 
-	list := selector.List()
 	token := result.Token()
-	return app.elementsOnToken(list, token)
+	return app.selectorOnToken(selector, token)
 }
 
-func (app *application) elementsOnToken(elements []selectors.Element, token results.Token) ([][]byte, error) {
-	output := [][]byte{}
-	for _, oneElement := range elements {
-		bytes, err := app.elementOnToken(oneElement, token)
-		if err != nil {
-			return nil, err
-		}
-
-		if bytes != nil {
-			output = append(output, bytes...)
-		}
-	}
-
-	return output, nil
-}
-
-func (app *application) elementOnToken(element selectors.Element, token results.Token) ([][]byte, error) {
-	if element.IsName() {
-		name := element.Name()
+func (app *application) selectorOnToken(selector selectors.Selector, token results.Token) ([][]byte, error) {
+	if selector.IsName() {
+		name := selector.Name()
 		return app.nameInsOnToken(name, token)
 	}
 
-	anyElement := element.Any()
-	return app.anyElementOnToken(anyElement, token)
+	anyName := selector.Any()
+	return app.anyNameOnToken(anyName, token)
 }
 
 func (app *application) nameInsOnToken(nameIns selectors.Name, token results.Token) ([][]byte, error) {
@@ -182,7 +165,7 @@ func (app *application) nameOnToken(path []string, token results.Token) ([][]byt
 	return output, isSameLine, nil
 }
 
-func (app *application) anyElementOnToken(anyElement selectors.Name, token results.Token) ([][]byte, error) {
+func (app *application) anyNameOnToken(anyElement selectors.Name, token results.Token) ([][]byte, error) {
 	block := token.Block()
 	input := block.Input()
 	index := block.Discovered()

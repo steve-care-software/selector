@@ -1,20 +1,50 @@
 package selectors
 
 type selector struct {
-	list []Element
+	name Name
+	any  Name
 }
 
-func createSelector(
-	list []Element,
+func createSelectorWithName(
+	name Name,
+) Selector {
+	return createSelectorInternally(name, nil)
+}
+
+func createSelectorWithAnySelector(
+	any Name,
+) Selector {
+	return createSelectorInternally(nil, any)
+}
+
+func createSelectorInternally(
+	name Name,
+	any Name,
 ) Selector {
 	out := selector{
-		list: list,
+		name: name,
+		any:  any,
 	}
 
 	return &out
 }
 
-// List returns the list of element
-func (obj *selector) List() []Element {
-	return obj.list
+// IsName returns true if name, false otherwise
+func (obj *selector) IsName() bool {
+	return obj.name != nil
+}
+
+// Name returns the name, if any
+func (obj *selector) Name() Name {
+	return obj.name
+}
+
+// IsAny returns true if any, false otherwise
+func (obj *selector) IsAny() bool {
+	return obj.any != nil
+}
+
+// Any returns the anySelector, if any
+func (obj *selector) Any() Name {
+	return obj.any
 }

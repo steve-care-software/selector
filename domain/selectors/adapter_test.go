@@ -8,24 +8,18 @@ func TestSelectorAdapter_isName_isNotSelected_Success(t *testing.T) {
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector(script)
+	selector, _, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if elements[0].IsAny() {
+	if selector.IsAny() {
 		t.Errorf("the element was expected to NOT contain an any")
 		return
 	}
 
-	name := elements[0].Name()
+	name := selector.Name()
 	if name.Name() != "myToken" {
 		t.Errorf("the name was expected to be '%s', '%s' returned", "myToken", name)
 		return
@@ -48,24 +42,18 @@ func TestSelectorAdapter_isName_isSelected_Success(t *testing.T) {
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector(script)
+	selector, _, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if elements[0].IsAny() {
+	if selector.IsAny() {
 		t.Errorf("the element was expected to NOT contain an any")
 		return
 	}
 
-	name := elements[0].Name()
+	name := selector.Name()
 	if name.Name() != "myToken" {
 		t.Errorf("the name was expected to be '%s', '%s' returned", "myToken", name)
 		return
@@ -88,24 +76,18 @@ func TestSelectorAdapter_isName_isSelected_withInsideNames_Success(t *testing.T)
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector(script)
+	selector, _, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if elements[0].IsAny() {
+	if selector.IsAny() {
 		t.Errorf("the element was expected to NOT contain an any")
 		return
 	}
 
-	name := elements[0].Name()
+	name := selector.Name()
 	if name.Name() != "myToken" {
 		t.Errorf("the name was expected to be '%s', '%s' returned", "myToken", name)
 		return
@@ -144,29 +126,23 @@ func TestSelectorAdapter_isAny_withPrefix_isSelect_Success(t *testing.T) {
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector(script)
+	selector, _, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
+	if !selector.IsAny() {
 		t.Errorf("the element was expected to contain an Any")
 		return
 	}
 
-	if elements[0].IsName() {
+	if selector.IsName() {
 		t.Errorf("the element was expected to NOT contain a name")
 		return
 	}
 
-	any := elements[0].Any()
+	any := selector.Any()
 	if !any.IsSelected() {
 		t.Errorf("the any was expecting to be selected")
 		return
@@ -185,29 +161,23 @@ func TestSelectorAdapter_isAny_withPrefix_isNOTSelect_Success(t *testing.T) {
 	`
 
 	adapter := NewAdapter()
-	selector, err := adapter.ToSelector(script)
+	selector, _, err := adapter.ToSelector(script)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	elements := selector.List()
-	if len(elements) != 1 {
-		t.Errorf("the selector was expecting %d elements, %d returned", 1, len(elements))
-		return
-	}
-
-	if !elements[0].IsAny() {
+	if !selector.IsAny() {
 		t.Errorf("the element was expected to contain an Any")
 		return
 	}
 
-	if elements[0].IsName() {
+	if selector.IsName() {
 		t.Errorf("the element was expected to NOT contain a name")
 		return
 	}
 
-	any := elements[0].Any()
+	any := selector.Any()
 	if any.IsSelected() {
 		t.Errorf("the any was expecting to NOT be selected")
 		return
